@@ -1,5 +1,6 @@
 package com.kelimeezberimde;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,16 +19,18 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+
 import co.dift.ui.SwipeToAction;
 
 public class FavoriWords extends AppCompatActivity implements OnInitListener {
     RecyclerView recyclerView;
     WordAdapter adapter;
     SwipeToAction swipeToAction;
-    List<Words> wordsList=new ArrayList<>();
-    DataBaseHelper dbHelper=new DataBaseHelper(this);
+    List<Words> wordsList = new ArrayList<>();
+    DataBaseHelper dbHelper = new DataBaseHelper(this);
     private TextToSpeech repeatTTS;
 
     @Override
@@ -56,23 +59,30 @@ public class FavoriWords extends AppCompatActivity implements OnInitListener {
             @Override
             public boolean swipeLeft(Words itemData) {
                 displaySnackbar("\"" + itemData.getWord() + "\"" + "  Favorilere Eklendi", null, null);
-//                SQLiteDatabase db=dbHelper.getWritableDatabase();
-//                db.execSQL("update Words set word='absandoon' where _id=1");
-//                db.close();
+
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.put("isFav", "0");
+                db.update("Words", values, "word = ?",
+                        new String[]{itemData.getWord()});
+                db.close();
+                removeWord(itemData);
                 return true;
             }
 
+            //region Sağdan Çekince Kaldırılacak
             @Override
             public boolean swipeRight(final Words itemData) {
-                final int pos = removeWord(itemData);
-                displaySnackbar("\"" + itemData.getWord() + "\"" + " Ezberleniyor...", "Geri", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        addWord(pos, itemData);
-                    }
-                });
+//                final int pos = removeWord(itemData);
+//                displaySnackbar("\"" + itemData.getWord() + "\"" + " Ezberleniyor...", "Geri", new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        addWord(pos, itemData);
+//                    }
+//                });
                 return true;
             }
+            //endregion
 
             @Override
             public void onClick(Words itemData) {
@@ -90,6 +100,7 @@ public class FavoriWords extends AppCompatActivity implements OnInitListener {
             //endregion
         });
     }
+
     private int removeWord(Words words) {
         int pos = wordsList.indexOf(words);
         wordsList.remove(words);
@@ -113,29 +124,33 @@ public class FavoriWords extends AppCompatActivity implements OnInitListener {
 
         snack.show();
     }
-    Cursor okunan=null;
 
-    private void sorgu(){
+    Cursor okunan = null;
 
-        SQLiteDatabase db=dbHelper.getReadableDatabase();
+    public void sorgu() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         try {
 
 //            okunan=db.query("Words",new String[] {"isFav"},"isFav=0",null,null,null,null);
-            okunan= dbHelper.getReadableDatabase().
+            okunan = dbHelper.getReadableDatabase().
                     rawQuery("select * from Words where isFav=?", new String[]{"1"});
-            while (okunan.moveToNext()){
-                String word=okunan.getString(okunan.getColumnIndex("word"));
-                String speak=okunan.getString(okunan.getColumnIndex("speak"));
-                String mean=okunan.getString(okunan.getColumnIndex("mean"));
-                this.wordsList.add(new Words(word,mean,mean));
+            while (okunan.moveToNext()) {
+                String word = okunan.getString(okunan.getColumnIndex("word"));
+                String speak = okunan.getString(okunan.getColumnIndex("speak"));
+                String mean = okunan.getString(okunan.getColumnIndex("mean"));
+                this.wordsList.add(new Words(word, mean, mean));
             }
-        }catch (SQLException e){
-            Toast.makeText(getApplicationContext(),"hata",Toast.LENGTH_LONG);
+            db.close();
+        } catch (SQLException e) {
+            Toast.makeText(getApplicationContext(), "hata", Toast.LENGTH_LONG);
         }
 
     }
-    public class setDefault extends AsyncTask<String,Integer,String> {
+
+    //region Async
+    public class setDefault extends AsyncTask<String, Integer, String> {
 
 
         @Override
@@ -148,5 +163,6 @@ public class FavoriWords extends AppCompatActivity implements OnInitListener {
     public void onInit(int status) {
 
     }
+    //endregion
 
 }

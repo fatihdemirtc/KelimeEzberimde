@@ -1,5 +1,6 @@
 package com.kelimeezberimde;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -47,20 +48,24 @@ public class ContinuingWords extends AppCompatActivity implements TextToSpeech.O
             Log.w("hata", "Veritabanı oluşturulamadı ve kopyalanamadı!");
         }
 
-
         adapter = new WordAdapter(this.wordsList);
         recyclerView.setAdapter(adapter);
+
         swipeToAction = new SwipeToAction(recyclerView, new SwipeToAction.SwipeListener<Words>() {
 
             @Override
             public boolean swipeLeft(Words itemData) {
                 displaySnackbar("\"" + itemData.getWord() + "\"" + "  Favorilere Eklendi", null, null);
-//                SQLiteDatabase db=dbHelper.getWritableDatabase();
-//                db.execSQL("update Words set word='absandoon' where _id=1");
-//                db.close();
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.put("isFav", "1");
+                db.update("Words", values, "word = ?",
+                        new String[]{itemData.getWord()});
+                db.close();
                 return true;
             }
 
+            //region Sağdan Çekince Kaldırılacak
             @Override
             public boolean swipeRight(final Words itemData) {
                 final int pos = removeWord(itemData);
@@ -72,10 +77,11 @@ public class ContinuingWords extends AppCompatActivity implements TextToSpeech.O
                 });
                 return true;
             }
+            //endregion
 
             @Override
             public void onClick(Words itemData) {
-                displaySnackbar("\"" + itemData.getWord() + "\"" + "  Tıklandı", null, null);
+                displaySnackbar("\"" + itemData.getWord() + "\"" + "  Telaffuzu", null, null);
                 repeatTTS.speak(itemData.getWord().toString(),
                         TextToSpeech.QUEUE_FLUSH, null);
             }
@@ -121,7 +127,7 @@ public class ContinuingWords extends AppCompatActivity implements TextToSpeech.O
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         try {
-           // okunan = db.query("Words", new String[]{"isFav"}, "isFav=0", null, null, null, null);
+            // okunan = db.query("Words", new String[]{"isFav"}, "isFav=0", null, null, null, null);
             okunan = dbHelper.getReadableDatabase().
                     rawQuery("select w.word,w.speak,w.mean from Words w INNER JOIN Group_Items g ON w.group_item=g._id where g.count>0 AND g.count <5", null);
             while (okunan.moveToNext()) {
@@ -135,6 +141,7 @@ public class ContinuingWords extends AppCompatActivity implements TextToSpeech.O
         }
     }
 
+    //region Async
     public class setDefault extends AsyncTask<String, Integer, String> {
 
 
@@ -148,6 +155,7 @@ public class ContinuingWords extends AppCompatActivity implements TextToSpeech.O
     public void onInit(int status) {
 
     }
+    //endregion
 
 
 }

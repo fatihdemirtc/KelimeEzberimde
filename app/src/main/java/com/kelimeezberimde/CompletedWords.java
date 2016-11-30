@@ -1,5 +1,6 @@
 package com.kelimeezberimde;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,7 +26,7 @@ import android.widget.Toast;
 import co.dift.ui.SwipeToAction;
 
 
-public class CompletedWords extends AppCompatActivity  implements OnInitListener {
+public class CompletedWords extends AppCompatActivity implements OnInitListener {
     RecyclerView recyclerView;
     WordAdapter adapter;
     SwipeToAction swipeToAction;
@@ -59,12 +60,16 @@ public class CompletedWords extends AppCompatActivity  implements OnInitListener
             @Override
             public boolean swipeLeft(Words itemData) {
                 displaySnackbar("\"" + itemData.getWord() + "\"" + "  Favorilere Eklendi", null, null);
-//                SQLiteDatabase db=dbHelper.getWritableDatabase();
-//                db.execSQL("update Words set word='absandoon' where _id=1");
-//                db.close();
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.put("isFav", "1");
+                db.update("Words", values, "word = ?",
+                        new String[]{itemData.getWord()});
+                db.close();
                 return true;
             }
 
+            //region Sağdan Çekince Kaldırılacak
             @Override
             public boolean swipeRight(final Words itemData) {
                 final int pos = removeWord(itemData);
@@ -76,6 +81,7 @@ public class CompletedWords extends AppCompatActivity  implements OnInitListener
                 });
                 return true;
             }
+            //endregion
 
             @Override
             public void onClick(Words itemData) {
@@ -139,6 +145,7 @@ public class CompletedWords extends AppCompatActivity  implements OnInitListener
         }
     }
 
+    //region Async
     public class setDefault extends AsyncTask<String, Integer, String> {
 
 
@@ -152,6 +159,7 @@ public class CompletedWords extends AppCompatActivity  implements OnInitListener
     public void onInit(int status) {
 
     }
+    //endregion
 
 
 }
