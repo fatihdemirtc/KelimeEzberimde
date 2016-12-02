@@ -38,9 +38,16 @@
         android:text="TEST ET"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="49dp"
         android:id="@+id/btntest"
+        android:layout_below="@+id/btncompleted"
+        android:layout_alignStart="@+id/btncompleted"
+        android:layout_marginTop="36dp" />
+
+    <Button
+        android:text="Ayarlar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/btnfav"
-        android:layout_alignStart="@+id/btncompleted" />
+        android:layout_alignParentEnd="true"
+        android:id="@+id/btnsettings" />
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.kelimeezberimde;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -25,7 +26,7 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 
 import co.dift.ui.SwipeToAction;
 
-public class FavoriWords extends AppCompatActivity implements OnInitListener {
+public class FavoriWords extends Activity implements OnInitListener {
     RecyclerView recyclerView;
     WordAdapter adapter;
     SwipeToAction swipeToAction;
@@ -146,7 +147,6 @@ public class FavoriWords extends AppCompatActivity implements OnInitListener {
         } catch (SQLException e) {
             Toast.makeText(getApplicationContext(), "hata", Toast.LENGTH_LONG);
         }
-
     }
 
     //region Async

@@ -1,5 +1,6 @@
 package com.kelimeezberimde;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -26,7 +27,7 @@ import android.widget.Toast;
 import co.dift.ui.SwipeToAction;
 
 
-public class CompletedWords extends AppCompatActivity implements OnInitListener {
+public class CompletedWords extends Activity implements OnInitListener {
     RecyclerView recyclerView;
     WordAdapter adapter;
     SwipeToAction swipeToAction;

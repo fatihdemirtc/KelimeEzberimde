@@ -1,12 +1,13 @@
 package com.kelimeezberimde;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,18 +24,17 @@ import java.util.List;
 
 import co.dift.ui.SwipeToAction;
 
-public class ContinuingWords extends Activity implements TextToSpeech.OnInitListener {
+public class ListWord extends Activity implements TextToSpeech.OnInitListener {
     RecyclerView recyclerView;
     WordAdapter adapter;
     SwipeToAction swipeToAction;
     List<Words> wordsList = new ArrayList<>();
     DataBaseHelper dbHelper = new DataBaseHelper(this);
     private TextToSpeech repeatTTS;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_completed_words);
+        setContentView(R.layout.activity_list_word);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -49,9 +49,9 @@ public class ContinuingWords extends Activity implements TextToSpeech.OnInitList
             Log.w("hata", "Veritabanı oluşturulamadı ve kopyalanamadı!");
         }
 
+
         adapter = new WordAdapter(this.wordsList);
         recyclerView.setAdapter(adapter);
-
         swipeToAction = new SwipeToAction(recyclerView, new SwipeToAction.SwipeListener<Words>() {
 
             @Override
@@ -82,7 +82,7 @@ public class ContinuingWords extends Activity implements TextToSpeech.OnInitList
 
             @Override
             public void onClick(Words itemData) {
-                displaySnackbar("\"" + itemData.getWord() + "\"" + "  Telaffuzu", null, null);
+                displaySnackbar("\"" + itemData.getWord() + "\"" + "  Tıklandı", null, null);
                 repeatTTS.speak(itemData.getWord().toString(),
                         TextToSpeech.QUEUE_FLUSH, null);
             }
@@ -128,9 +128,8 @@ public class ContinuingWords extends Activity implements TextToSpeech.OnInitList
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         try {
-            // okunan = db.query("Words", new String[]{"isFav"}, "isFav=0", null, null, null, null);
             okunan = dbHelper.getReadableDatabase().
-                    rawQuery("select w.word,w.speak,w.mean from Words w INNER JOIN Group_Items g ON w.group_item=g._id where g.count>0 AND g.count <5", null);
+                    rawQuery("select * from Words where group_item=?", new String[]{"1"});
             while (okunan.moveToNext()) {
                 String word = okunan.getString(okunan.getColumnIndex("word"));
                 String speak = okunan.getString(okunan.getColumnIndex("speak"));
@@ -143,21 +142,9 @@ public class ContinuingWords extends Activity implements TextToSpeech.OnInitList
         }
     }
 
-    //region Async
-    public class setDefault extends AsyncTask<String, Integer, String> {
-
-
-        @Override
-        protected String doInBackground(String... strings) {
-            return null;
-        }
-    }
-
-
-    public void onInit(int status) {
+    @Override
+    public void onInit(int i) {
 
     }
-    //endregion
-
-
 }
+
