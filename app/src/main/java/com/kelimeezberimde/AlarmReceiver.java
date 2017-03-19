@@ -22,7 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder mBuilder =
                 (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
                         .setTicker("Kelime Ezberimde")
                         .setContentTitle("Kelime Ezberimde")
                         .setContentText("Ödevlerini Tamamla")
